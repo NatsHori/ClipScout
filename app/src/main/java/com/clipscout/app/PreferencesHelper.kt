@@ -15,6 +15,9 @@ object PreferencesHelper {
     private const val KEY_API_KEY = "gemini_api_key"
     private const val KEY_SYSTEM_PROMPT = "system_prompt"
     private const val KEY_SERVICE_ENABLED = "service_enabled"
+    private const val KEY_MODEL_NAME = "gemini_model_name"
+
+    const val DEFAULT_MODEL_NAME = "gemini-1.5-flash"
 
     val DEFAULT_SYSTEM_PROMPT = """あなたはプロのスカウト担当者です。
 以下のInstagram（またはSNS）のスクリーンショット画像を分析し、そのユーザーに送るスカウトDMを日本語で生成してください。
@@ -86,6 +89,21 @@ object PreferencesHelper {
         getEncryptedPreferences(context)
             .edit()
             .putBoolean(KEY_SERVICE_ENABLED, enabled)
+            .apply()
+    }
+
+    // ========== Geminiモデル名 ==========
+
+    fun getModelName(context: Context): String {
+        return getEncryptedPreferences(context)
+            .getString(KEY_MODEL_NAME, DEFAULT_MODEL_NAME)
+            ?: DEFAULT_MODEL_NAME
+    }
+
+    fun saveModelName(context: Context, modelName: String) {
+        getEncryptedPreferences(context)
+            .edit()
+            .putString(KEY_MODEL_NAME, modelName.trim())
             .apply()
     }
 }

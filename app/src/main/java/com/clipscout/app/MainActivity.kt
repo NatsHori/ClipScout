@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -50,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupClickListeners()
+        setupModelDropdown()
         loadSavedSettings()
     }
 
@@ -104,6 +106,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupModelDropdown() {
+        val suggestedModels = listOf(
+            "gemini-1.5-flash",
+            "gemini-1.5-pro",
+            "gemini-2.0-flash",
+            "gemini-2.5-pro"
+        )
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, suggestedModels)
+        binding.etModelName.setAdapter(adapter)
+    }
+
     // ========== 設定の読み込み / 保存 ==========
 
     private fun loadSavedSettings() {
@@ -111,6 +124,9 @@ class MainActivity : AppCompatActivity() {
         binding.etApiKey.setText(PreferencesHelper.getApiKey(this))
         binding.etApiKey.transformationMethod = PasswordTransformationMethod.getInstance()
         binding.btnToggleApiKeyVisibility.text = "表示"
+
+        // モデル名
+        binding.etModelName.setText(PreferencesHelper.getModelName(this), false)
 
         // システムプロンプト
         binding.etSystemPrompt.setText(PreferencesHelper.getSystemPrompt(this))
@@ -121,6 +137,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveSettings() {
         val apiKey = binding.etApiKey.text.toString().trim()
+        val modelName = binding.etModelName.text.toString().trim().ifBlank { PreferencesHelper.DEFAULT_MODEL_NAME }
         val systemPrompt = binding.etSystemPrompt.text.toString().trim()
 
         if (apiKey.isBlank()) {
@@ -135,8 +152,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         PreferencesHelper.saveApiKey(this, apiKey)
+        PreferencesHelper.saveModelName(this, modelName)
         PreferencesHelper.saveSystemPrompt(this, systemPrompt)
-        showToast("💾 設定を保存しました")
+        showToast("💾 設定を保存しました ($modelName)")
     }
 
     // ========== サービスON/OFF ==========

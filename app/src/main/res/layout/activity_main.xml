@@ -190,6 +190,58 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- ======================================= -->
+        <!-- 使用モデル選択 カード -->
+        <!-- ======================================= -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.ClipScout.Card">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🤖 AIモデル選択"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="主要モデルから選択、または最新のモデル名を自由に手入力できます"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="12dp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.ClipScout.TextInputLayout">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/etModelName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="モデル名 (例: gemini-1.5-flash)"
+                        android:inputType="text"
+                        android:fontFamily="monospace"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ======================================= -->
         <!-- システムプロンプト カード -->
         <!-- ======================================= -->
         <com.google.android.material.card.MaterialCardView

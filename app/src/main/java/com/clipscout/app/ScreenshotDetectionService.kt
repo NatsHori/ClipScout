@@ -211,9 +211,10 @@ class ScreenshotDetectionService : Service() {
         }
 
         val systemPrompt = PreferencesHelper.getSystemPrompt(this)
+        val modelName = PreferencesHelper.getModelName(this)
 
         // 通知を「生成中」に更新
-        updateMonitoringNotification("✨ スカウトDM生成中...")
+        updateMonitoringNotification("✨ スカウトDM生成中 ($modelName)...")
 
         val bitmap = loadBitmapFromUri(uri)
         if (bitmap == null) {
@@ -223,8 +224,8 @@ class ScreenshotDetectionService : Service() {
             return
         }
 
-        Log.d(TAG, "Calling Gemini API...")
-        val result = geminiClient.generateScoutDm(apiKey, systemPrompt, bitmap)
+        Log.d(TAG, "Calling Gemini API with model: $modelName...")
+        val result = geminiClient.generateScoutDm(apiKey, modelName, systemPrompt, bitmap)
         bitmap.recycle()
 
         result.fold(

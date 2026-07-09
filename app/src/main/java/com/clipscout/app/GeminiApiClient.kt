@@ -26,8 +26,8 @@ import java.util.concurrent.TimeUnit
 class GeminiApiClient {
 
     companion object {
-        private const val BASE_URL =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+        private const val BASE_URL_PREFIX =
+            "https://generativelanguage.googleapis.com/v1beta/models/"
         private const val CONNECT_TIMEOUT_SEC = 30L
         private const val READ_TIMEOUT_SEC = 60L
         private const val WRITE_TIMEOUT_SEC = 30L
@@ -49,13 +49,15 @@ class GeminiApiClient {
      * スクリーンショット画像とシステムプロンプトをGemini APIに送り、
      * スカウトDM文を生成して返す。
      *
-     * @param apiKey   Gemini APIキー
+     * @param apiKey     Gemini APIキー
+     * @param modelName  使用モデル名 (例: gemini-1.5-flash, gemini-1.5-pro)
      * @param systemPrompt スカウト生成用のシステムプロンプト
-     * @param bitmap   スクリーンショットのBitmap
+     * @param bitmap     スクリーンショットのBitmap
      * @return Result<String> 成功時はDM文、失敗時はエラー
      */
     suspend fun generateScoutDm(
         apiKey: String,
+        modelName: String = "gemini-1.5-flash",
         systemPrompt: String,
         bitmap: Bitmap
     ): Result<String> = withContext(Dispatchers.IO) {
@@ -64,8 +66,9 @@ class GeminiApiClient {
             val requestBodyMap = buildRequestBody(systemPrompt, base64Image)
             val jsonBody = gson.toJson(requestBodyMap)
 
+            val endpointUrl = "${BASE_URL_PREFIX}${modelName}:generateContent?key=$apiKey"
             val request = Request.Builder()
-                .url("$BASE_URL?key=$apiKey")
+                .url(endpointUrl)
                 .post(jsonBody.toRequestBody("application/json; charset=utf-8".toMediaType()))
                 .addHeader("Content-Type", "application/json")
                 .build()
