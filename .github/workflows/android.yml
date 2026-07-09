@@ -11,7 +11,6 @@ on:
       - master
   workflow_dispatch:
 
-# GitHub Release の作成・上書きに必要な権限
 permissions:
   contents: write
 
@@ -21,24 +20,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ─────────────────────────────────────────────
-      # 1. コードのチェックアウト
-      # ─────────────────────────────────────────────
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      # ─────────────────────────────────────────────
-      # 2. JDK 17 のセットアップ
-      # ─────────────────────────────────────────────
       - name: ☕ Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # ─────────────────────────────────────────────
-      # 3. gradle-wrapper.jar が未コミットの場合に自動ダウンロード
-      # ─────────────────────────────────────────────
       - name: 🔧 Ensure gradle-wrapper.jar exists
         run: |
           WRAPPER_JAR="gradle/wrapper/gradle-wrapper.jar"
@@ -48,14 +38,8 @@ jobs:
             curl -fsSL \
               "https://raw.githubusercontent.com/gradle/gradle/v8.7.0/gradle/wrapper/gradle-wrapper.jar" \
               -o "$WRAPPER_JAR"
-            echo "✅ Downloaded ($(du -sh $WRAPPER_JAR | cut -f1))"
-          else
-            echo "✅ Found ($(du -sh $WRAPPER_JAR | cut -f1))"
           fi
 
-      # ─────────────────────────────────────────────
-      # 4. Gradle キャッシュ（ビルド時間短縮）
-      # ─────────────────────────────────────────────
       - name: 📦 Cache Gradle packages
         uses: actions/cache@v4
         with:
@@ -66,21 +50,31 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # ─────────────────────────────────────────────
-      # 5. gradlew に実行権限を付与
-      # ─────────────────────────────────────────────
       - name: 🔧 Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # ─────────────────────────────────────────────
-      # 6. デバッグAPKのビルド
-      # ─────────────────────────────────────────────
       - name: 🔨 Build debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        id: build_apk
+        run: |
+          echo "Starting build..."
+          ./gradlew assembleDebug --no-daemon --stacktrace > build_output.log 2>&1 || (cat build_output.log && exit 1)
 
-      # ─────────────────────────────────────────────
-      # 7. APK情報をログ出力
-      # ─────────────────────────────────────────────
+      - name: 🚨 Print failure details to Step Summary
+        if: failure()
+        run: |
+          echo "### ❌ Build Failed — Error Log Summary" >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          grep -E "e: |FAILURE:|What went wrong:|A problem occurred|Exception|error:|Error:" build_output.log -C 3 | tail -n 80 >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: 📤 Upload Build Log Artifact (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-log
+          path: build_output.log
+          retention-days: 7
+
       - name: 📊 Report APK info
         run: |
           APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
@@ -89,82 +83,23 @@ jobs:
           echo "   Path : $APK_PATH"
           echo "   Size : $APK_SIZE"
 
-      # ─────────────────────────────────────────────
-      # 8. 既存の "latest-build" タグ & Release を削除してから再作成
-      #    → 常に同じURL (latest-build) でダウンロードできる
-      #
-      #    📲 直リンクURL（mainへのpush後に有効）:
-      #    https://github.com/[ユーザー名]/ClipScout/releases/download/latest-build/app-debug.apk
-      #    または
-      #    https://github.com/[ユーザー名]/ClipScout/releases/latest/download/app-debug.apk
-      # ─────────────────────────────────────────────
       - name: 🏷️ Publish APK to GitHub Release (latest-build)
-        # PRからのビルドは除外（mainへのpush時のみRelease更新）
         if: github.event_name != 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # コミット情報の取得
           COMMIT_SHA="${{ github.sha }}"
           SHORT_SHA="${COMMIT_SHA:0:7}"
           BUILD_DATE=$(date '+%Y-%m-%d %H:%M JST' --date='9 hours')
           BRANCH="${{ github.ref_name }}"
 
-          echo "📦 Creating/updating GitHub Release 'latest-build'..."
-
-          # 既存のリリースとタグを削除（存在しない場合はエラーを無視）
           gh release delete latest-build --yes 2>/dev/null || true
           git push origin --delete latest-build 2>/dev/null || true
 
-          # 新しいリリースを作成してAPKをアタッチ
           gh release create latest-build \
             --title "📱 ClipScout — 最新ビルド (${BUILD_DATE})" \
             --notes "## 📲 インストール方法
 
-          **このページの \`app-debug.apk\` をスマートフォンでタップしてインストール**
-
-          ---
-
-          ### ⚠️ インストール前に端末側で設定が必要
-
-          1. Androidの「設定」→「セキュリティ」または「アプリ」
-          2. 「提供元不明のアプリ」→ブラウザ（Chromeなど）を許可
-
-          ---
-
-          ### 📋 ビルド情報
-          - **ブランチ**: \`${BRANCH}\`
-          - **コミット**: \`${SHORT_SHA}\`
-          - **ビルド日時**: ${BUILD_DATE}
-          - **ビルド番号**: #${{ github.run_number }}
-
-          ---
-
-          ### 🔑 インストール後の初回設定
-
-          1. アプリを開く
-          2. メディア・通知権限を付与
-          3. 「他のアプリの上に表示」をON（クリップボード書き込みに必須）
-          4. [Google AI Studio](https://aistudio.google.com/) でAPIキーを取得して入力
-          5. 監視サービスをONにする" \
+          **このページの \`app-debug.apk\` をスマートフォンでタップしてインストール**" \
             --prerelease \
             "app/build/outputs/apk/debug/app-debug.apk"
-
-          echo ""
-          echo "✅ Release published!"
-          echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "📲 直リンクダウンロードURL:"
-          echo "   https://github.com/${{ github.repository }}/releases/latest/download/app-debug.apk"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-      # ─────────────────────────────────────────────
-      # 9. Artifactsにも保存（PRビルドや手動実行のバックアップ用）
-      # ─────────────────────────────────────────────
-      - name: 📤 Upload APK as workflow artifact (backup)
-        uses: actions/upload-artifact@v4
-        with:
-          name: ClipScout-debug-build${{ github.run_number }}
-          path: app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 14
-          if-no-files-found: error
