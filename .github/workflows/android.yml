@@ -59,13 +59,29 @@ jobs:
           echo "Starting build..."
           ./gradlew assembleDebug --no-daemon --stacktrace > build_output.log 2>&1 || (cat build_output.log && exit 1)
 
-      - name: 🚨 Print failure details to Step Summary
+      - name: 🚨 Report failure to BUILD_ERROR.md and push to repo
         if: failure()
         run: |
-          echo "### ❌ Build Failed — Error Log Summary" >> $GITHUB_STEP_SUMMARY
-          echo '```text' >> $GITHUB_STEP_SUMMARY
-          grep -E "e: |FAILURE:|What went wrong:|A problem occurred|Exception|error:|Error:" build_output.log -C 3 | tail -n 80 >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "# ❌ Android CI Build Error Report" > BUILD_ERROR.md
+          echo "Date: $(date '+%Y-%m-%d %H:%M:%S JST' --date='9 hours')" >> BUILD_ERROR.md
+          echo "Commit: ${{ github.sha }}" >> BUILD_ERROR.md
+          echo "" >> BUILD_ERROR.md
+          echo "## Error Summary" >> BUILD_ERROR.md
+          echo '```text' >> BUILD_ERROR.md
+          grep -E "e: |FAILURE:|What went wrong:|A problem occurred|Exception|error:|Error: |unresolved reference" build_output.log -C 5 | tail -n 120 >> BUILD_ERROR.md
+          echo '```' >> BUILD_ERROR.md
+          echo "" >> BUILD_ERROR.md
+          echo "## Full Build Log Tail (Last 80 lines)" >> BUILD_ERROR.md
+          echo '```text' >> BUILD_ERROR.md
+          tail -n 80 build_output.log >> BUILD_ERROR.md
+          echo '```' >> BUILD_ERROR.md
+
+          git config user.name "ClipScout Builder"
+          git config user.email "clipscout@build.local"
+          git add BUILD_ERROR.md
+          git commit -m "ci: Update BUILD_ERROR.md with latest build failure details [skip ci]" || true
+          git pull --rebase origin main || true
+          git push origin main || true
 
       - name: 📤 Upload Build Log Artifact (on failure)
         if: failure()
