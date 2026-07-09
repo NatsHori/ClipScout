@@ -99,15 +99,15 @@ class ClipboardHelperActivity : AppCompatActivity() {
      * 通知には生成されたDM文の冒頭20文字をプレビューとして表示。
      */
     private fun showCopiedNotification(copiedText: String) {
-        val preview = if (copiedText.length > 40) "${copiedText.take(40)}…" else copiedText
+        val shortPreview = if (copiedText.length > 40) "${copiedText.take(40)}…" else copiedText
         val nm = getSystemService(NotificationManager::class.java)
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID_COPIED)
             .setContentTitle("✅ DM文面をコピーしました")
-            .setContentText(preview)
+            .setContentText(shortPreview)
             .setStyle(
                 NotificationCompat.BigTextStyle()
-                    .bigText("$preview\n\nそのまま貼り付けてご利用ください。")
+                    .bigText("$copiedText\n\nそのまま貼り付けてご利用ください。")
             )
             .setSmallIcon(android.R.drawable.ic_menu_send)
             .setAutoCancel(true)
