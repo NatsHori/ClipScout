@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 完全透明な1px View。ClipboardHelperActivityがフォーカスを取得するだけの最小限レイアウト。 -->
+<View xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="1dp"
+    android:layout_height="1dp"
+    android:background="@android:color/transparent" />

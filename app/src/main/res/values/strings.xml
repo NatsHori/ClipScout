@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ClipScout</string>
+    <string name="service_monitoring">スクリーンショットを監視中 📷</string>
+    <string name="service_processing">✨ スカウトDM生成中…</string>
+    <string name="copied_title">✅ DM文面をコピーしました</string>
+    <string name="copied_body">クリップボードにスカウトDMを貼り付けてご利用ください</string>
+    <string name="error_no_api_key">APIキーが設定されていません</string>
+</resources>

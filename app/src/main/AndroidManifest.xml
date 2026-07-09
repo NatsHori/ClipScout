@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- ===== 必要な権限 ===== -->
+
+    <!-- ネットワーク通信（Gemini API） -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- メディア画像の読み取り（Android 13 = API 33 以上） -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!-- Foreground Serviceの実行 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- Android 14 (API 34) 以降のForeground Serviceタイプ指定 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <!-- 他アプリの上にオーバーレイ表示（バックグラウンドからのActivity起動 & クリップボード書き込み用） -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- 通知の表示（Android 13 = API 33 以上で必須） -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- 端末起動時のサービス自動再開 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ClipScout">
+
+        <!-- メイン設定画面 -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+            クリップボード書き込み用の透過ヘルパーActivity
+            - taskAffinity="" : 独立したタスクスタックで起動
+            - excludeFromRecents="true" : 履歴画面に表示しない
+            - noHistory="true" : バックスタックに残さない
+            - Theme.ClipScout.Transparent : 完全透明テーマ
+        -->
+        <activity
+            android:name=".ClipboardHelperActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ClipScout.Transparent"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:launchMode="singleInstance" />
+
+        <!-- スクリーンショット検知 + Gemini API連携 Foreground Service -->
+        <service
+            android:name=".ScreenshotDetectionService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <!-- 端末起動時の自動起動レシーバー -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+</manifest>

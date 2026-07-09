@@ -1,0 +1,44 @@
+# ===== Android ビルド成果物 =====
+/app/build/
+/build/
+
+# ===== Gradle =====
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.jar
+.gradletasknamecache
+
+# ===== ローカル設定（個人の環境に依存するファイル） =====
+local.properties
+*.properties
+!gradle-wrapper.properties
+
+# ===== Android Studio / IntelliJ IDEA =====
+/.idea/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+
+# ===== キーストア / 署名情報（絶対にコミットしないこと！） =====
+*.jks
+*.keystore
+keystore.properties
+
+# ===== OS固有ファイル =====
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# ===== テスト成果物 =====
+app/src/androidTest/
+app/src/test/
+
+# ===== その他 =====
+*.apk
+*.aar
+*.class
+out/
+captures/
