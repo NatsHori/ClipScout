@@ -126,11 +126,26 @@ class GeminiApiClient {
      * }
      */
     private fun buildRequestBody(systemPrompt: String, base64Image: String): Map<String, Any> {
+        val userInstruction = """
+以下のスクリーンショットのプロフィールや投稿内容を分析し、対象者に送るスカウトDMを作成してください。
+
+【厳格な文章ルール】
+1. 短すぎる文章（100文字以下）は禁止です。必ず180文字〜250文字程度のまとまりのある文章で構成してください。
+2. 画像から相手の具体的な魅力や世界観を最低2つ読み取り、文章内で自然に言及して褒めてください。
+3. 構成は「丁寧な挨拶 → 具体的な魅力への共感・賞賛 → スカウトの提案（モデル/アンバサダー等） → 返信のお願い」にしてください。
+4. 前置き・説明文・「件名:」などは一切省き、そのまま送れるDM本文のみを出力してください。
+""".trimIndent()
+
         return mapOf(
+            "system_instruction" to mapOf(
+                "parts" to listOf(
+                    mapOf("text" to systemPrompt)
+                )
+            ),
             "contents" to listOf(
                 mapOf(
                     "parts" to listOf(
-                        mapOf("text" to systemPrompt),
+                        mapOf("text" to userInstruction),
                         mapOf(
                             "inline_data" to mapOf(
                                 "mime_type" to "image/jpeg",
@@ -141,9 +156,9 @@ class GeminiApiClient {
                 )
             ),
             "generationConfig" to mapOf(
-                "temperature" to 0.7,
-                "maxOutputTokens" to 600,
-                "topP" to 0.9
+                "temperature" to 0.75,
+                "maxOutputTokens" to 1024,
+                "topP" to 0.95
             )
         )
     }
