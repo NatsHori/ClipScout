@@ -50,7 +50,7 @@
         <!-- ======================================= -->
         <!-- 権限不足バナー（全権限が揃ったら非表示） -->
         <!-- ======================================= -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/tvPermissionsBanner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -69,12 +69,12 @@
                 android:textColor="#FF8888"
                 android:textSize="13sp" />
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- ======================================= -->
         <!-- サービスON/OFF カード -->
         <!-- ======================================= -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -119,12 +119,12 @@
                     app:trackTint="@color/surface_variant" />
 
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- ======================================= -->
         <!-- Gemini APIキー カード -->
         <!-- ======================================= -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -187,12 +187,12 @@
 
                 </LinearLayout>
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- ======================================= -->
         <!-- システムプロンプト カード -->
         <!-- ======================================= -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -251,7 +251,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- ======================================= -->
         <!-- 設定保存ボタン -->
@@ -268,7 +268,7 @@
         <!-- ======================================= -->
         <!-- 権限ステータス カード -->
         <!-- ======================================= -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
@@ -423,7 +423,7 @@
                     style="@style/Widget.ClipScout.Button.Outlined" />
 
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- フッター -->
         <TextView

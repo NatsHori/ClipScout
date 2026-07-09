@@ -56,7 +56,7 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
 
     // Security - EncryptedSharedPreferences
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("androidx.security:security-crypto:1.0.0")
 
     // OkHttp for Gemini API calls
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
