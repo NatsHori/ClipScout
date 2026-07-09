@@ -13,6 +13,7 @@ gradle-app.setting
 local.properties
 *.properties
 !gradle-wrapper.properties
+!gradle.properties
 
 # ===== Android Studio / IntelliJ IDEA =====
 /.idea/
